@@ -652,11 +652,6 @@ def main():
     print(f"  Final status   : {LOAN_STATUS.get(status_num, status_num)}")
     print(f"  repaidAmount   : {repaid_amt}")
     print()
-    print("Root cause: _processRepayLogs() checks topics[0] == REPAY_EVENT_SIGNATURE")
-    print("  but NEVER checks log.address_ against loan.repayFlow.withToken")
-    print(f"  FakeRepayer ({fake_addr}) emitted the event")
-    print(f"  Registered token was: {order[1][2]}")
-    print(f"  These do NOT match — yet USCLoanManager accepted the proof")
 
 
 if __name__ == "__main__":
