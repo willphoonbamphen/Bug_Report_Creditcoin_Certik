@@ -212,8 +212,3 @@
   Final status   : Repaid
   repaidAmount   : 115792089237316195423570985008687907853269984665640564039457584007913129639935
 
-Root cause: _processRepayLogs() checks topics[0] == REPAY_EVENT_SIGNATURE
-  but NEVER checks log.address_ against loan.repayFlow.withToken
-  FakeRepayer (0xb80ad26921eFA701c9A04f5c8d97c27e52478a21) emitted the event
-  Registered token was: 0x000000000000000000000000000000000000dEaD
-  These do NOT match — yet USCLoanManager accepted the proof
